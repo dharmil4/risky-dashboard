@@ -139,9 +139,14 @@ export default function CXOSummary() {
             <div className="max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-700 custom-scrollbar">
               <h3 className="text-gray-400 mb-1">Top Contributing Messages</h3>
               {data.topContributors?.length > 0 ? (
-                <ul className="list-disc list-inside text-blue-300">
+                <ul className="space-y-1 text-blue-300">
                   {data.topContributors.slice(0, 4).map((item, idx) => (
-                    <li key={idx} className="whitespace-normal break-words">{item.message}</li>
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-blue-400 text-sm pt-[2px]">•</span>
+                      <span className="whitespace-pre-line break-words leading-snug text-sm">
+                        {item.message}
+                      </span>
+                    </li>
                   ))}
                 </ul>
               ) : (
