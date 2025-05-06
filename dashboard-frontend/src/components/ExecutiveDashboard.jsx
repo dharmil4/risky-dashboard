@@ -9,7 +9,7 @@ export default function ExecutiveDashboard() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    axios.get('https://eagleeye-dashboard.onrender.com/api/executive')
+    axios.get('https://risky-dashboard.onrender.com/api/executive')
       .then(res => setData(res.data))
       .catch(err => console.error('Executive API error:', err));
   }, []);

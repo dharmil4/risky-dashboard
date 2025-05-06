@@ -11,7 +11,7 @@ export default function FirewallDashboard() {
     const { range, interval } = useDateRange();
 
     const fetchData = () => {
-        axios.get(`https://eagleeye-dashboard.onrender.com/api/firewall?range=${range}&interval=${interval}`)
+        axios.get(`https://risky-dashboard.onrender.com/api/firewall?range=${range}&interval=${interval}`)
             .then(res => setSummary(res.data))
             .catch(err => console.error('Firewall Summary API error:', err));
     };
