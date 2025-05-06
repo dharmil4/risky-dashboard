@@ -62,7 +62,7 @@ router.get('/cxo', async (req, res) => {
 
     const topMessages = Object.entries(messageCountMap)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 2)
+      .slice(0, 4)
       .map(([message, count]) => ({ message, count }));
 
     const severityValueAggResp = await client.search({
