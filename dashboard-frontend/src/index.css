@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #000000;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Roboto Mono', monospace;
+  /* Ensure vertical stacking */
+  justify-content: flex-start;
+  /* Align content at the top */
+  align-items: stretch;
+  /* Stretch to full width */
+  min-width: 320px;
+  min-height: 100vh;
+  /* Ensure full viewport height */
+  background-color: #000000;
+  color: white;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Orbitron', sans-serif;
+}
+
+button {
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* div {
+  z-index: 2;
+} */
+
+#dha {
+  z-index: 1;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
+  /* Thin scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #4b5563;
+  /* Equivalent to gray-700 */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  /* Equivalent to blue-500 */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+  /* Slightly darker blue on hover (blue-600) */
+}
+
+
+.styled-text {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.5));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+  transition: text-shadow 0.3s ease-in-out;
+}
+
+/* Fallback for unsupported browsers */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .styled-text {
+    background: none;
+    -webkit-text-fill-color: initial;
+    color: white;
+  }
+}
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  button {}
+}
