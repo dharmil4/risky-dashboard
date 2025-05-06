@@ -7,7 +7,6 @@ import SidebarLayout from './components/SidebarLayout';
 import ExecutiveDashboard from './components/ExecutiveDashboard';
 import FirewallDashboard from './components/FirewallDashboard';
 import { DateRangeProvider } from './components/DateRangeContext';
-import DemoDashboard from './components/demo';
 
 const CyberBackground = () => {
   const canvasRef = useRef(null);
@@ -141,7 +140,6 @@ function App() {
               <Route path="/cxo" element={<CXOSummary />} />
               <Route path="/executive" element={<ExecutiveDashboard />} />
               <Route path="/firewall" element={<FirewallDashboard />} />
-              <Route path="/demo" element={<DemoDashboard />} />
             </Route>
           </Routes>
         </div>
