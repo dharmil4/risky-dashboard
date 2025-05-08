@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import GeolocationMap from './GeoLocation';
 import axios from 'axios';
 import {
   Treemap, AreaChart, Area, LineChart, Line,
@@ -13,7 +14,7 @@ export default function CXOSummary() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    axios.get('https://risky-dashboard.onrender.com/api/cxo')
+    axios.get('http://192.168.1.141:4000/api/cxo')
       .then(res => setData(res.data))
       .catch(err => console.error('RiskTrend API error:', err));
   }, []);
@@ -65,6 +66,13 @@ export default function CXOSummary() {
     }, {})
   );
 
+  const severityColors = {
+    critical: '#ef4444',
+    high: '#f97316',
+    medium: '#eab308',
+    low: '#22c55e'
+  };
+
   return (
     <div className="space-y-8">
       {/* Section 1: Risk Score and Timeseries */}
@@ -110,18 +118,20 @@ export default function CXOSummary() {
                   />
                   <Line
                     type="monotone"
-                    dataKey="count"
+                    dataKey="severityScore"  // ✅ matches your response
                     stroke="#38bdf8"
                     strokeWidth={3}
                     dot={{ r: 4, stroke: '#38bdf8', strokeWidth: 2, fill: '#0f172a' }}
                     activeDot={{ r: 6 }}
                   />
+
                 </LineChart>
               </ResponsiveContainer>
             )}
           </div>
         </div>
       </div>
+
 
       {/* Section 2: Risk Category and Severity Value Trend */}
       <div className="flex flex-wrap -mx-2">
@@ -205,6 +215,47 @@ export default function CXOSummary() {
           </div>
         </div>
       </div>
+
+      {/* Timeseries Chart Section */}
+      <div className="bg-gray-900 text-white rounded-xl p-6 shadow space-y-4">
+        {data.severityBuckets.length === 0 ? (
+          <div className="text-gray-400 text-center mt-20">No timeseries data available</div>
+        ) : (
+          <div className="h-80">
+            <h2 className="text-xl font-semibold mb-1">Alerts Trend</h2>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data.severityBuckets}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fill: '#cbd5e1', fontSize: 12 }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#555' }}
+                />
+                <YAxis
+                  tick={{ fill: '#cbd5e1', fontSize: 12 }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#555' }}
+                  tickFormatter={(value) => Math.round(value)}  // Round to nearest integer
+                  domain={[0, (dataMax) => Math.ceil(dataMax)]}  // Start at 0, round up max
+                  allowDecimals={false}  // Prevent decimal ticks
+                  tickCount={5}  // Suggest 5 ticks
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1f2937', border: 'none', color: '#fff' }}
+                  labelStyle={{ color: '#93c5fd' }}
+                  formatter={(value, name) => [`${value}`, name.charAt(0).toUpperCase() + name.slice(1)]}
+                />
+                <Line type="monotone" dataKey="critical" stroke={severityColors.critical} strokeWidth={2} />
+                <Line type="monotone" dataKey="high" stroke={severityColors.high} strokeWidth={2} />
+                <Line type="monotone" dataKey="medium" stroke={severityColors.medium} strokeWidth={2} />
+                <Line type="monotone" dataKey="low" stroke={severityColors.low} strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </div>
+
 
       {/* Section 3: Attack Surface + Excessive Privileges */}
       <div className="flex flex-wrap -mx-2">
@@ -347,6 +398,13 @@ export default function CXOSummary() {
           </div>
         </div>
       </div>
+
+      {/* section 5 Geo location of alerts  */}
+      <div>
+        <GeolocationMap />
+      </div>
+
+
     </div>
   );
 }

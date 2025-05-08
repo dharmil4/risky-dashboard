@@ -46,10 +46,46 @@ router.get('/cxo', async (req, res) => {
 
     const riskCat = riskScore >= 6 ? "High Risk" : riskScore >= 3 ? "Medium Risk" : "Low Risk";
 
-    const timeseries = highCritResp.body.aggregations.per_hour.buckets.map(bucket => ({
+    const severityTrendResp = await client.search({
+      index: INDEX,
+      size: 0,
+      body: {
+        query: {
+          bool: {
+            must: [
+
+              {
+                terms: {
+                  Severity: ["INFO", "ERROR"]
+                }
+              }
+            ]
+          }
+        },
+        aggs: {
+          severity_trend: {
+            date_histogram: {
+              field: "EventTime",
+              calendar_interval: CALENDAR_INTERVAL  // e.g., 'day', 'week'
+            },
+            aggs: {
+              avg_severity: {
+                avg: {
+                  field: "SeverityValue"  // Must be numeric type in mapping
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+
+    const timeseries = severityTrendResp.body.aggregations.severity_trend.buckets.map(bucket => ({
       timestamp: bucket.key_as_string,
-      count: bucket.doc_count
+      severityScore: bucket.avg_severity.value !== null ? bucket.avg_severity.value.toFixed(2) : 0
     }));
+
 
     const messageCountMap = {};
     highCriticalDocs.forEach(log => {
@@ -175,6 +211,53 @@ router.get('/cxo', async (req, res) => {
 
     const totalInsecureConnections = connectionSurfaceData.reduce((sum, d) => sum + d.count, 0);
 
+
+    // === Severity Timeseries ===
+    const timeseriesResult = await client.search({
+      index: INDEX,
+      size: 0,
+      body: {
+        query: {
+          range: {
+            SeverityValue: {
+              gte: 0
+            }
+          }
+        },
+        aggs: {
+          per_day: {
+            date_histogram: {
+              field: 'EventTime',
+              calendar_interval: CALENDAR_INTERVAL,
+              format: 'MMM dd'
+            },
+            aggs: {
+              critical: {
+                filter: { range: { SeverityValue: { gte: 8 } } }
+              },
+              high: {
+                filter: { range: { SeverityValue: { gte: 5, lt: 8 } } }
+              },
+              medium: {
+                filter: { range: { SeverityValue: { gte: 3, lt: 5 } } }
+              },
+              low: {
+                filter: { range: { SeverityValue: { lt: 3 } } }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const severityBuckets = timeseriesResult.body.aggregations.per_day.buckets.map(bucket => ({
+      date: bucket.key_as_string,
+      critical: bucket.critical.doc_count,
+      high: bucket.high.doc_count,
+      medium: bucket.medium.doc_count,
+      low: bucket.low.doc_count
+    }));
+
     res.json({
       totalLogs,
       highCriticalLogs,
@@ -187,7 +270,8 @@ router.get('/cxo', async (req, res) => {
       excessivePrivilegeData,
       internetFacingPorts,
       connectionSurfaceData,
-      totalInsecureConnections
+      totalInsecureConnections,
+      severityBuckets
     });
   } catch (err) {
     console.error('Risk trend error:', err);
