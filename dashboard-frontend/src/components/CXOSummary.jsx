@@ -14,7 +14,7 @@ export default function CXOSummary() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    axios.get('http://192.168.1.141:4000/api/cxo')
+    axios.get('https://risky-dashboard.onrender.com/api/cxo')
       .then(res => setData(res.data))
       .catch(err => console.error('RiskTrend API error:', err));
   }, []);
